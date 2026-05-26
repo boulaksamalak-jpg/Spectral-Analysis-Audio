@@ -11,7 +11,7 @@ This repository contains a complete MATLAB implementation evaluating and compari
 
 ## Dataset & Signal Source
 The algorithms in this repository are validated using a real-world audio signal:
-- **File:** `sample-1.wav`
+- **File:** `my_audio.wav`
 - **Characteristics:** Contains time-varying acoustic features, making it an ideal candidate for evaluating both global stationary estimation and localized short-time analysis (e.g., speech/music processing).
 
 ## Key Insights & Results

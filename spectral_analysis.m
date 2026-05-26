@@ -14,7 +14,7 @@ close all;
 % ============================================
 
 % Change this to the name of your .wav file
-filename = 'sample-1.wav';   % <-- MODIFY THIS LINE
+filename = 'my_audio.wav';   % <-- MODIFY THIS LINE
 
 % Check if file exists
 if ~exist(filename, 'file')

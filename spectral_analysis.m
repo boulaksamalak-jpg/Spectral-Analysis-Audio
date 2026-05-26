@@ -14,7 +14,7 @@ close all;
 % ============================================
 
 % Change this to the name of your .wav file
-filename = 'my_audio.wav';   % <-- MODIFY THIS LINE
+filename = 'sample-1.wav';   % <-- MODIFY THIS LINE
 
 % Check if file exists
 if ~exist(filename, 'file')
@@ -31,8 +31,8 @@ t = (0:length(x)-1)/Fs;          % Time axis
 
 figure
 plot(t, x)
-title(['Signal audio: ' filename])
-xlabel('Temps (s)')
+title(['Audio Signal: ' filename])
+xlabel('Time (s)')
 ylabel('Amplitude')
 
 %% ============================================
@@ -41,7 +41,9 @@ ylabel('Amplitude')
 
 figure
 spectrogram(x, 256, 200, 256, Fs, 'yaxis')
-title(['Spectrogramme du signal: ' filename])
+title(['Signal Spectrogram: ' filename])
+xlabel('Time (s)')
+ylabel('Frequency (Hz)')
 
 %% ============================================
 % 4. FFT SPECTRAL ANALYSIS
@@ -53,8 +55,8 @@ f = (0:N-1) * (Fs / N);
 
 figure
 plot(f, 20*log10(abs(X)))
-title('Spectre FFT')
-xlabel('Fréquence (Hz)')
+title('FFT Spectrum')
+xlabel('Frequency (Hz)')
 ylabel('Amplitude (dB)')
 xlim([0 Fs/2])
 
@@ -69,8 +71,8 @@ p = 10;      % Model order
 
 figure
 plot(f_ar, 20*log10(abs(H_ar)))
-title('PSD par modèle AR (Yule-Walker)')
-xlabel('Fréquence (Hz)')
+title('PSD using AR Model (Yule-Walker)')
+xlabel('Frequency (Hz)')
 ylabel('Amplitude (dB)')
 
 %% ============================================
@@ -82,8 +84,8 @@ ylabel('Amplitude (dB)')
 
 figure
 plot(f_burg, 20*log10(abs(H_burg)))
-title('PSD - Méthode Burg')
-xlabel('Fréquence (Hz)')
+title('PSD - Burg Method')
+xlabel('Frequency (Hz)')
 ylabel('Amplitude (dB)')
 
 %% ============================================
@@ -105,9 +107,9 @@ end
 figure
 imagesc(PSD)
 axis xy
-title('Evolution temporelle du spectre AR')
-xlabel('Temps (segments)')
-ylabel('Fréquence (indice)')
+title('Time Evolution of AR Spectrum')
+xlabel('Time Segments')
+ylabel('Frequency Index')
 
 %% ============================================
 % 8. ARMA MODEL (without System Identification Toolbox)
@@ -131,8 +133,8 @@ H_clean(isinf(H_clean)) = 0;
 
 figure
 plot(f_arma, 20*log10(abs(H_arma_final)))
-title('PSD - Modèle ARMA')
-xlabel('Fréquence (Hz)')
+title('PSD - ARMA Model')
+xlabel('Frequency (Hz)')
 ylabel('Amplitude (dB)')
 
 %% ============================================
@@ -147,8 +149,8 @@ plot(f_burg, 20*log10(abs(H_burg)), 'b', 'LineWidth', 1.5)
 plot(f_arma, 20*log10(abs(H_arma_final)), 'g', 'LineWidth', 1.5)
 
 legend('FFT', 'AR Yule-Walker', 'AR Burg', 'ARMA')
-title('Comparaison des méthodes spectrales')
-xlabel('Fréquence (Hz)')
+title('Comparison of Spectral Methods')
+xlabel('Frequency (Hz)')
 ylabel('Amplitude (dB)')
 xlim([0 Fs/2])
 grid on

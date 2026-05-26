@@ -54,27 +54,4 @@ Executing both scripts on a dual-tone or acoustic wav file highlights the distin
 3. **The Crucial Role of Zeros (ARMA):** Pure AR models can only track peaks (poles). The ARMA model's Moving Average component successfully introduces spectral nulls (zeros), allowing it to map anti-resonances (valleys) which are mathematically invisible to pure AR models.
 
 ---
-
-## 💻 Code Repositories & Execution
-
-### File Directory Layout
-```text
-├── MATLAB_Implementation.m   # Uses Signal Processing Toolbox
-├── Python_Implementation.py   # Pure NumPy/SciPy (Mobile & Desktop ready)
-└── my_audio.wav               # Your target acoustic validation file
-## 🐍 Python Cross-Platform Validation (Pydroid 3 Compatible)
-To validate the mathematical and numerical integrity of the implemented algorithms, a parallel, open-source **Python** implementation has been developed. 
-
-This extension serves as a rigorous cross-platform benchmark, proving that the DSP equations yield identical physical results regardless of the proprietary environment.
-
-### ⚙️ Engineering Workarounds for Mobile/Open-Source Constraints:
-Since modern Python environments (and mobile IDEs like **Pydroid 3**) lack exact 1:1 built-in wrappers for advanced MATLAB Signal Processing Toolbox functions, the following custom solutions were engineered:
-
-* **Pure Python AR Estimators:** Instead of relying on heavy, compiled external libraries (like `spectrum` or `statsmodels`) which often fail to compile on ARM-based Android architectures, **Yule-Walker** (via Toeplitz matrix solvers) and the **Burg Method** (via Levinson-Durbin and lattice filter reflection coefficients) were coded from scratch using pure `numpy` and `scipy`.
-* **Custom ARMA `invfreqz` Fitting:** To bypass the removal of `invfreqz` in modern `scipy.signal` versions, a custom **Linear Least Squares (LLS)** rational transfer function fitter (`my_invfreqz`) was built. It perfectly mimics MATLAB's frequency-domain equation error method to resolve system poles and zeros.
-* **Strict Signal Normalization:** Handled sample-rate preservation and bit-depth amplitude matching (`wavfile.read` amplitude casting to $[-1, 1]$) to guarantee that the absolute dB values on the Python spectral plots perfectly align with MATLAB's outputs.
-
----
-
----
 *Practical project completed as part of the Advanced Signal Processing curriculum, Electronics Department.*

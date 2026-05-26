@@ -1,158 +1,30 @@
-# Spectral-Analysis-Audio
-clc;
-clear;
-close all;
+# Parametric & Classical Spectral Analysis of Audio Signals
 
-%% ============================================
-% Spectral Analysis of Audio Signals
-% This script works on ANY .wav file
-% Just change the filename below
-% ============================================
+## Overview
+This repository contains a complete MATLAB implementation evaluating and comparing classical and parametric spectral estimation methods applied to real-world acoustic data. The project focuses on addressing the resolution and leakage limitations of classical Fourier analysis when handling short, noisy, or non-stationary signals.
 
-%% ============================================
-% 1. CHOOSE YOUR AUDIO FILE
-% ============================================
+## Implemented Methods
+- **Classical Approach:** Fast Fourier Transform (FFT) and global spectral analysis.
+- **Parametric AR Estimation:** Auto-Regressive modeling using both **Yule-Walker** (`aryule`) and **Burg** (`arburg`) algorithms.
+- **Parametric ARMA Estimation:** Combined Auto-Regressive Moving Average modeling using rational filter fitting (`invfreqz`).
+- **Time-Frequency Localization:** Local temporal segmentation adapted specifically for analyzing non-stationary characteristics in audio signals.
 
-% Change this to the name of your .wav file
-filename = 'sample-1.wav';   % <-- MODIFY THIS LINE
+## Dataset & Signal Source
+The algorithms in this repository are validated using a real-world audio signal:
+- **File:** `sample-1.wav`
+- **Characteristics:** Contains time-varying acoustic features, making it an ideal candidate for evaluating both global stationary estimation and localized short-time analysis (e.g., speech/music processing).
 
-% Check if file exists
-if ~exist(filename, 'file')
-    error('File "%s" not found. Please check the filename or path.', filename);
-end
+## Key Insights & Results
+- **Frequency Resolution:** Parametric methods (AR/ARMA) provide significantly higher frequency resolution and smoother Power Spectral Density (PSD) profiles compared to classical FFT, especially for shorter data windows.
+- **Burg vs. Yule-Walker:** The Burg method exhibits greater stability, sharper peak resolution, and fewer frequency shifts because it minimizes both forward and backward prediction errors simultaneously.
+- **Non-Stationarity Management:** Standard global FFT fails to capture temporal changes in spectral properties. Implementing local windowed segmentation is essential to accurately track frequency variations over time.
 
-%% ============================================
-% 2. LOAD THE SIGNAL
-% ============================================
+## Repository Structure
+- `spectral_analysis.m`: The core, fully commented MATLAB script containing all processing steps (from audio acquisition to advanced modeling).
+- `sample-1.wav`: The real audio signal used for testing and validation.
 
-[x, Fs] = audioread(filename);   % Load audio signal
-x = x(:,1);                      % Mono channel
-t = (0:length(x)-1)/Fs;          % Time axis
+## Key MATLAB Functions Utilized
+- **Signal Processing Toolbox:** `audioread`, `spectrogram`, `aryule`, `arburg`, `freqz`, `invfreqz`.
 
-figure
-plot(t, x)
-title(['Signal audio: ' filename])
-xlabel('Temps (s)')
-ylabel('Amplitude')
-
-%% ============================================
-% 3. CHECK NON-STATIONARITY (Spectrogram)
-% ============================================
-
-figure
-spectrogram(x, 256, 200, 256, Fs, 'yaxis')
-title(['Spectrogramme du signal: ' filename])
-
-%% ============================================
-% 4. FFT SPECTRAL ANALYSIS
-% ============================================
-
-N = length(x);
-X = fft(x);
-f = (0:N-1) * (Fs / N);
-
-figure
-plot(f, 20*log10(abs(X)))
-title('Spectre FFT')
-xlabel('Fréquence (Hz)')
-ylabel('Amplitude (dB)')
-xlim([0 Fs/2])
-
-%% ============================================
-% 5. AR MODEL - YULE-WALKER METHOD
-% ============================================
-
-p = 10;      % Model order
-
-[a, e] = aryule(x, p);
-[H_ar, f_ar] = freqz(sqrt(e), a, 1024, Fs);
-
-figure
-plot(f_ar, 20*log10(abs(H_ar)))
-title('PSD par modèle AR (Yule-Walker)')
-xlabel('Fréquence (Hz)')
-ylabel('Amplitude (dB)')
-
-%% ============================================
-% 6. AR MODEL - BURG METHOD
-% ============================================
-
-[a_burg, e_burg] = arburg(x, p);
-[H_burg, f_burg] = freqz(sqrt(e_burg), a_burg, 1024, Fs);
-
-figure
-plot(f_burg, 20*log10(abs(H_burg)))
-title('PSD - Méthode Burg')
-xlabel('Fréquence (Hz)')
-ylabel('Amplitude (dB)')
-
-%% ============================================
-% 7. LOCAL ANALYSIS (NON-STATIONARY SIGNALS)
-% ============================================
-
-window_length = 1024;
-noverlap = 512;
-
-segments = buffer(x, window_length, noverlap, 'nodelay');
-
-for i = 1:size(segments, 2)
-    segment = segments(:, i);
-    [a, e] = aryule(segment, p);
-    [H, f] = freqz(sqrt(e), a, 512, Fs);
-    PSD(:, i) = 20*log10(abs(H));
-end
-
-figure
-imagesc(PSD)
-axis xy
-title('Evolution temporelle du spectre AR')
-xlabel('Temps (segments)')
-ylabel('Fréquence (indice)')
-
-%% ============================================
-% 8. ARMA MODEL (without System Identification Toolbox)
-% ============================================
-
-q = 4;      % MA order
-
-N_arma = length(x);
-X_arma = fft(x);
-H_arma_tf = X_arma ./ max(abs(X_arma));     % Normalization
-w = linspace(0, pi, length(H_arma_tf)/2);
-
-% Remove any NaN or Inf values
-H_clean = H_arma_tf(1:length(w));
-H_clean(isnan(H_clean)) = 0;
-H_clean(isinf(H_clean)) = 0;
-
-[b, a_arma] = invfreqz(H_clean, w, q, p);
-
-[H_arma_final, f_arma] = freqz(b, a_arma, 1024, Fs);
-
-figure
-plot(f_arma, 20*log10(abs(H_arma_final)))
-title('PSD - Modèle ARMA')
-xlabel('Fréquence (Hz)')
-ylabel('Amplitude (dB)')
-
-%% ============================================
-% 9. GLOBAL COMPARISON
-% ============================================
-
-figure
-plot(f, 20*log10(abs(X(1:length(f)))), 'k', 'LineWidth', 1)
-hold on
-plot(f_ar, 20*log10(abs(H_ar)), 'r', 'LineWidth', 1.5)
-plot(f_burg, 20*log10(abs(H_burg)), 'b', 'LineWidth', 1.5)
-plot(f_arma, 20*log10(abs(H_arma_final)), 'g', 'LineWidth', 1.5)
-
-legend('FFT', 'AR Yule-Walker', 'AR Burg', 'ARMA')
-title('Comparaison des méthodes spectrales')
-xlabel('Fréquence (Hz)')
-ylabel('Amplitude (dB)')
-xlim([0 Fs/2])
-grid on
-
-%% ============================================
-% END OF SCRIPT
-% ============================================
+---
+*Practical project completed as part of the Advanced Signal Processing curriculum, Electronics Department.*

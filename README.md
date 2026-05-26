@@ -21,7 +21,7 @@ The algorithms in this repository are validated using a real-world audio signal:
 
 ## Repository Structure
 - `spectral_analysis.m`: The core, fully commented MATLAB script containing all processing steps (from audio acquisition to advanced modeling).
-- `sample-1.wav`: The real audio signal used for testing and validation.
+- `my_audio.wav`: The real audio signal used for testing and validation.
 
 ## Key MATLAB Functions Utilized
 - **Signal Processing Toolbox:** `audioread`, `spectrogram`, `aryule`, `arburg`, `freqz`, `invfreqz`.
